@@ -19,7 +19,9 @@ I found that their are two python libraries to support the cause, I found  *pytu
 But YouTube doesn't give you what you want staright away.
 </br>
 Next  
+
 *Problem*
+
 I had was to merge the video and audio of your own choice and  *Challenge*  was to keep it simple to use for others sake.
 </br>
 
