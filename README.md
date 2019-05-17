@@ -1,11 +1,18 @@
 # YouTube-Video-Audio-Downloader
 </br>
-:rocket: There are a lot of websites which offers downloading video from YouTube but none of them allows to **Download in Resolution of your own choice.**
+:rocket: There are a lot of websites which offers downloading video from YouTube but none of them allows to 
+
+**Download in Resolution of your own choice.**
+
 </br>
+
 ![YToff_gif](https://user-images.githubusercontent.com/41824020/57936562-db13e680-78e1-11e9-9055-7faf05d51c0f.gif)
+
 </br>
 </br>
+
 *So I decided to write my own script for this purpose.*
+
 </br>
 I found that their are two python libraries to support the cause, I found *pytube* to be more easy and appealing.
 </br>
@@ -28,4 +35,15 @@ Next *Problem* I had was to merge the video and audio of your own choice and *Ch
 > > Add it's bin to environment
 
 :camel: ***That's it.*** :sparkles:
+</br>
+</br>
 
+![YToff_img](https://user-images.githubusercontent.com/41824020/57936989-ace2d680-78e2-11e9-869a-734956a66411.png)
+
+</br>
+
+![YToff_img2](https://user-images.githubusercontent.com/41824020/57937080-ddc30b80-78e2-11e9-97c2-70419c738853.png)
+
+</br>
+
+- [x] Add Playlist Download Support.
