@@ -21,7 +21,7 @@ But YouTube doesn't give you what you want staright away.
 Next  *Problem*  I had was to merge the video and audio of your own choice and  *Challenge*  was to keep it simple to use for others sake.
 </br>
 
-### Requirements
+### Requirements (If using Python file)
 > pytube</br>
 > > In Windows CMD: py -m pip install pytube</br>
 > > In Linux terminal: sudo pip install pytube</br>
@@ -50,5 +50,10 @@ Next  *Problem*  I had was to merge the video and audio of your own choice and  
 
 
 </br>
+
+
+# Requirements (If using exe File)
+> > Download it from their website.
+> > Add it's bin to environment
 
 - [x] Add Playlist Download Support.
