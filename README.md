@@ -53,6 +53,7 @@ Next  *Problem*  I had was to merge the video and audio of your own choice and  
 
 
 # Requirements (If using exe File)
+> ffmpeg
 > > Download it from their website.
 > > Add it's bin to environment
 
