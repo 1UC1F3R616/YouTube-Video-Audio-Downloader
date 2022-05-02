@@ -1,168 +1,123 @@
 # -*-  coding:utf-8 -*-
 
-# Imports
-from pytube import YouTube, Playlist
-import os
-import shutil
-from pyfiglet import figlet_format as ff
-from random import randint
+# Internal Imports
+import sys
+import random
+import subprocess
+
+# Global Colors
+reddish = "\033[91m {}\033[00m"
+purplelish = "\033[95m {}\033[00m"
+cyan = "\033[96m {}\033[00m"
+green = "\033[92m {}\033[00m"
+blueish = "\033[94m {}\033[00m"
+
+# Global Variables
+FORMAT = ''
+
+def welcome_screen():
+    preety_text = """
+                                ___           ___           ___     
+                               /\  \         /\__\         /\__\    
+      ___         ___         /::\  \       /:/ _/_       /:/ _/_   
+     /|  |       /\__\       /:/\:\  \     /:/ /\__\     /:/ /\__\  
+    |:|  |      /:/  /      /:/  \:\  \   /:/ /:/  /    /:/ /:/  /  
+    |:|  |     /:/__/      /:/__/ \:\__\ /:/_/:/  /    /:/_/:/  /   
+  __|:|__|    /::\  \      \:\  \ /:/  / \:\/:/  /     \:\/:/  /    
+ /::::\  \   /:/\:\  \      \:\  /:/  /   \::/__/       \::/__/     
+ ~~~~\:\  \  \/__\:\  \      \:\/:/  /     \:\  \        \:\  \     
+      \:\__\      \:\__\      \::/  /       \:\__\        \:\__\    
+       \/__/       \/__/       \/__/         \/__/         \/__/    
+"""
+
+    pick_color = [blueish, purplelish][random.randint(0, 1)]
+
+    print(pick_color .format(preety_text))
+    print('\n\n')
 
 
-# Function to Download a single video
-def single(url):
-    yt = YouTube(url)
-    print("[-] Now Downloading %s\n" % yt.title)
-    tell = yt.streams.all()
-    print('[+] Id: 0\t\tAUDIO ONLY')
-    for x in yt.streams.all():
-            if str(x.resolution)!='None' and str(x.mime_type) == 'video/webm':
-                    print('[+] Id: '+str(x.itag), '\tResolution: '+str(x.resolution)+'\t'+str(x.filesize//(1024*1024))+' mb')
+def display_error_message(message):
+    print(reddish .format('[!] {}\n'.format(message)))
+    exit(0)
 
-    tag = int(input('[+] Resolution Id: '))
-    if tag!=0:
+
+def help():
+    """
+    Help Menu
+    How to use this script
+    """
+    pass
+
+def raw_input(input_message):
+    something = input(input_message)
+    return something
+
+
+def url_info(url):
+    """
+    If invalid url then through error
+    return: url, platform info, collection type
+    platform info is either spotify, yt, yt_music
+    collection type is either playlist, single, album
+    """
+    
+    if 'music.youtube.com' in url: platform = 'yt_music'
+    elif ('youtu.be' in url) or ('www.youtube.com' in url): platform = 'yt'
+    elif 'open.spotify.com' in url: platform = 'spotify'
+    else: raise Exception('Failed to identify platform, please check your url')
+
+    return url, platform, 'None'
+
+
+def yt_commands():
+    print('''
+    - `yt-dlp -S "height:720" -f "[ext=mp4]+ba[ext=m4a]/b[ext=mp4]" -i url` No better than 720p in mp4
+    - `yt-dlp -S "height:720" -i url` mp4 no criteria here
+    - `yt-dlp -f "ba" -i url` download best format audio only
+    - `yt-dlp -f "ba[ext=mp3]/ba" -i url` mp3 audio format or fallback
+    - `yt-dlp --list-formats -i url`list all formats
+
+    - `for f in *.webm ;do ffmpeg -i "$f" -vn -ab 256k -ar 44100 -y "${f%.*}.mp3" -threads 8; done` ffmpeg conversion from other audio formats
+    - `for f in *.webm ;do ffmpeg -i "$f" -vn -ab 320k -ar 48000 -y "${f%.*}.mp3" -threads 8; done` ffmpeg conversion from other audio formats
+    ''')
+
+
+def menu():
+    if len(sys.argv[1:]) == 0:
+        help() # Display help menu if no url and options are passed
+        exit(0)
+    
+    try:
+        url, platform, collection_type = url_info(sys.argv[1])
+    except Exception as e:
+        display_error_message(e)
+
+    if platform == 'spotify': # spotify supports mp3 downloads only as of now
+        # it's safe to pass any argument here. @1UC1F3R616
+        arg1 = url
+        if len(sys.argv[1:]) >= 2:
+            arg2 = sys.argv[2] # mp3/m4a/flac/opus/ogg/wav
+            if arg2 not in ['mp3', 'm4a', 'flac', 'opus', 'ogg', 'wav']:
+                arg2 = 'mp3'
+            if len(sys.argv[1:]) == 3:
+                arg3 = sys.argv[3] # location for downloading the content
+            else: arg3 = '.'
+        else:
+            arg2 = 'mp3'
+            arg3= '.'
         try:
-            try:shutil.rmtree('videok9')
-            except:pass
-            os.mkdir('videok9')
-            print('[-] Video Download Started: ',yt.title)
-            yt.streams.get_by_itag(tag).download('videok9')
-            vname = os.listdir('videok9')[0]
-        except Exception as e:print('[-]', e)
-
-    l=[]
-    for x in yt.streams.all():
-                    if str(x.mime_type) in ['audio/webm', 'audio/mp4']:
-                            l.append((str(x.itag), str(x.abr), str(x.mime_type)[6:], str(x.audio_codec), x.default_filename))
-    for x in l:
-            if x[3] in ['vorbis', 'mp4a.40.2']:
-                    atag = int(x[0])
-                    aname = x[-1]
-                    if x[3] == 'vorbis':
-                            break
-    else:
-            atag = int(l[0][0])
-
-    print("[-] Audio Download Started.\n")
-    yt.streams.get_by_itag(atag).download()
-
-    if tag!=0:
-        try:
-            print("[-] Merging using ffmpeg.\n")
-            os.system("ffmpeg -i \"videok9/"+vname+"\" -i \""+aname+"\" -ab 192k -r 27 -shortest \""+vname.split('.')[0]+'_.mp4'"\"")
-            shutil.rmtree('videok9')
-            os.remove(aname)
-            print('            [S][U][C][C][E][S][S]            ')
+            result = subprocess.Popen(['spotdl', arg1, '--output-format', arg2, '--dt', '4', '--st', '8'], stdout=sys.stdout, stderr=sys.stderr, cwd=arg3)
         except Exception as e:
-            print(e)
-    else:
-        output = input("[+] Transcode in mp3 from webm/mp4a?: Press 1 else Enter ")
-        if output=='1':
-            os.system("ffmpeg -i \""+aname+"\" -ab 192 \""+aname.split('.')[0]+"_.mp3"+"\"")
-            os.remove(aname)
-        print('            [S][U][C][C][E][S][S]            ')
-
-
-# Playlist Download
-def playlist(url):
-    pl = Playlist(url)
-    pl.populate_video_urls() # We need t populate it otherwise video_urls will give an empty list.
-    videos = pl.video_urls
-    #print(videos)
-    #print('second')
-    tag = int(input("""
-        >> Enter 0 to download Audio only.
-        >> Enter Video-Resolution ID to be downloaded.
-        >> Ex. '247' without quotes for 720p res.
+            display_error_message(e)
+    elif platform in ['yt', 'yt_music']:
+        yt_commands()
+            
 
         
-        Available Resolutions\n:
-        [+] ID: 248     1080p
-        [+] ID: 247     720p
-        [+] ID: 244     480p
-        [+] ID: 243     360p
-        [+] ID: 242     240p
-        [+] ID: 278     144p\n
-        """))
-    print('>>> Script is executed Successfully.')
-    print('>>> Give a star if it helps you. It will encorage me :)')
-    print('>>> ffmpeg console will appear, ignore it. Do not close or else merge will fail.')
-    if tag != 0:
-        for iurl in videos:
-            yt = YouTube(iurl)
-            try:
-                try:shutil.rmtree('videok9')
-                except:pass
-                os.mkdir('videok9')
-                yt.streams.get_by_itag(tag).download('videok9')
-                print("[-] Success: ", yt.title)
-                vname = os.listdir('videok9')[0]
-                make_needed = True
-            except Exception as e:
-                make_needed = False
-                if str(e) == "'NoneType' object has no attribute 'download'":
-                    print("[*] Format decreased for: ",yt.title)
-                    try:
-                        yt.streams.filter(progressive=True).order_by('resolution').desc().first().download()
-                        print("[-] success: ", yt.title)
-                    except:
-                        print('[*]', yt.title, ' ::is skipped fully. Please download using command line.')
-                        
-            if make_needed: #not needed means audio and video are present already.
-                l=[]
-                for x in yt.streams.all():
-                    if str(x.mime_type) in ['audio/webm', 'audio/mp4']:
-                            l.append((str(x.itag), str(x.abr), str(x.mime_type)[6:], str(x.audio_codec), x.default_filename))
-                for x in l:
-                    if x[3] in ['vorbis', 'mp4a.40.2']:
-                        atag = int(x[0])
-                        aname = x[-1]
-                        if x[3] == 'vorbis':
-                            break
-                else:
-                    atag = int(l[0][0])
-
-                yt.streams.get_by_itag(atag).download()
-                
-                try:
-                    os.system("ffmpeg -i \"videok9/"+vname+"\" -i \""+aname+"\" -ab 160k -r 27 -shortest \""+vname.split('.')[0]+'_.mp4'"\"")
-                    shutil.rmtree('videok9')
-                    os.remove(aname)
-                    print("            [S][U][C][C][E][S][S]            ")
-                except Exception as e:
-                    print('[*]', e)
-                    print("[*] Make sure ffmpeg is added in Environment Variable.")
-            else:pass
-                    
-    elif tag == 0:
-            output = input("[+] Transcode in mp3 from webm/mp4a?: Press 1 else Enter ")
-            for iurl in videos:
-                aname = yt.streams.filter(only_audio=True).first().default_filename
-                yt = YouTube(iurl)
-                print('[-] success: ',yt.title)
-                yt.streams.filter(only_audio=True).first().download()
-                if output=='1':
-                    os.system("ffmpeg -i \""+aname+"\" -ab 160k \""+aname.split('.')[0]+"_.mp3"+"\"")
-                    os.remove(aname)
-    else:
-            print('[*] Enter correct choice like 243')
-            playlist()
 
 
-if __name__ == "__main__":
 
-    # Wanna Be Cool
-    print(ff('YToff' ,font=['block', 'isometric1', 'isometric2'][randint(0,2)]))
 
-    url = input('[+] Url for Video/Playlist: ')
-
-    # Decide if playlist or single track
-    try:
-        if 'https://www.youtube.com/playlist?' in url:
-            playlist(url)
-        else:
-            single(url)
-    except Exception as e:
-        print(e, '\n[*] Give YouTube Video or Playlist link.')
-
-    input('            [F][U][L][L][][S][U][C][C][E][S][S]            ')
-
+if  __name__ == '__main__':
+    welcome_screen()
+    menu()
